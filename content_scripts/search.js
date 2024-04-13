@@ -147,7 +147,7 @@ function splitAndTrim(value) {
 	return value.split(',').filter((word) => word).map((item) => item.trim());
 }
 
-function splitIncludeAndExclude(phraseArray) {
+function separateIncludeAndExclude(phraseArray) {
 	let include = [];
 	let exclude = [];
 
@@ -186,6 +186,13 @@ function trimLeftMinus(element) {
 	return element.replace('-', '');
 }
 
+function prependKeywordToEachPhrase(phrases, keyword, includeSeparator, excludeSeparator, overallSeparator) {
+	[include, exclude] = separateIncludeAndExclude(phrases);
+	include = include.map(encodeURIWithoutSpaces).map(enquotePhrase).map(prependStringFunc(`${keyword}`)).join(includeSeparator);
+	exclude = exclude.map(encodeURIWithoutSpaces).map(trimLeftMinus).map(enquotePhrase).map(prependStringFunc(`-${keyword}`)).join(excludeSeparator);
+	return `${include}${overallSeparator}${exclude}`;
+}
+
 function onSearchButtonClick() {
 	saveLocalStorage(); 
 
@@ -193,7 +200,7 @@ function onSearchButtonClick() {
 		['q', ''], // general query, allows using special commands not included in query parameters (inurl/intitle/intext/before/after/-)
 		['as_q', ''], // all of these words or phrases
 		['as_epq', ''], // exact occurrence, for now isn't used
-		['as_eq', ''], // exclude query argument, doesn't work with phrases, for now isn't used
+		['as_eq', ''], // exclude query argument, doesn't work with phrases (or maybe it works but it produces results like -"jack -russell"), for now isn't used
 		['as_oq', ''], // any of these words or phrases
 		['as_nlo', ''], // lower numerical bound
 		['as_nhi', ''], // upper numerical bound
@@ -205,53 +212,24 @@ function onSearchButtonClick() {
 		['as_filetype', ''], // file type
 	]);
 
-	let extendedQueryParameters = new Map([
-		['before', ''],
-		['after', ''],
-		['intitle', ''],
-		['inurl', ''],
-		['intext', ''],
-		['-intitle', ''],
-		['-inurl', ''],
-		['-intext', ''],
-		['filetype', ''],
-		['-filetype', ''],
-	]);
+	let extendedQueryParameters = [];
 
 	let allPhrases = splitAndTrim(inputs.get('all-phrases').value);
-	let [include, exclude] = splitIncludeAndExclude(allPhrases);
-	include = include.map(encodeURIWithoutSpaces).map(enquotePhrase);
-	exclude = exclude.map(encodeURIWithoutSpaces).map(trimLeftMinus).map(enquotePhrase).map(prependStringFunc('-'));
-	allPhrases = [...include, ...exclude].join('+');
-	queryParameters.set('as_q', allPhrases);
+	let q = prependKeywordToEachPhrase(allPhrases, '', '+', '+', '+'); // trivial case of no actual keyword
+	queryParameters.set('as_q', q);
 
 	let anyPhrases = splitAndTrim(inputs.get('any-phrases').value);
 	anyPhrases = anyPhrases.map(encodeURIWithoutSpaces).map(enquotePhrase).join('+');
 	queryParameters.set('as_oq', anyPhrases);
 
 	let urlContains = splitAndTrim(inputs.get('url').value);
-	[include, exclude] = splitIncludeAndExclude(urlContains);
-	include = include.map(encodeURIWithoutSpaces).map(enquotePhrase).map(prependStringFunc('inurl:')).join('+');
-	exclude = exclude.map(encodeURIWithoutSpaces).map(trimLeftMinus).map(enquotePhrase).map(prependStringFunc('-inurl:')).join('+');
-
-	extendedQueryParameters.set('inurl', include);
-	extendedQueryParameters.set('-inurl', exclude);
+	extendedQueryParameters.push(prependKeywordToEachPhrase(urlContains, 'inurl:', '+', '+', '+'));
 
 	let titleContains = splitAndTrim(inputs.get('title').value);
-	[include, exclude] = splitIncludeAndExclude(titleContains);
-	include = include.map(encodeURIWithoutSpaces).map(enquotePhrase).map(prependStringFunc('intitle:')).join('+');
-	exclude = exclude.map(encodeURIWithoutSpaces).map(trimLeftMinus).map(enquotePhrase).map(prependStringFunc('-intitle:')).join('+');
-
-	extendedQueryParameters.set('intitle', include);
-	extendedQueryParameters.set('-intitle', exclude);
+	extendedQueryParameters.push(prependKeywordToEachPhrase(titleContains, 'intitle:', '+', '+', '+'));
 
 	let textContains = splitAndTrim(inputs.get('text').value);
-	[include, exclude] = splitIncludeAndExclude(textContains);
-	include = include.map(encodeURIWithoutSpaces).map(enquotePhrase).map(prependStringFunc('intext:')).join('+');
-	exclude = exclude.map(encodeURIWithoutSpaces).map(trimLeftMinus).map(enquotePhrase).map(prependStringFunc('-intext:')).join('+');
-
-	extendedQueryParameters.set('intext', include);
-	extendedQueryParameters.set('-intext', exclude);
+	extendedQueryParameters.push(prependKeywordToEachPhrase(textContains, 'intext:', '+', '+', '+'));
 
 	queryParameters.set('as_nlo', inputs.get('lower-bound').value);
 	queryParameters.set('as_nhi', inputs.get('upper-bound').value);
@@ -264,34 +242,26 @@ function onSearchButtonClick() {
 	if (!isDatePickerEnabled()) {
 		queryParameters.set('as_qdr', selectors.get('period').value);
 	} else {
-		extendedQueryParameters.set('before', inputs.get('before-date').value);
-		extendedQueryParameters.set('after', inputs.get('after-date').value);
+		let beforeDate = inputs.get('before-date').value;
+		let afterDate = inputs.get('after-date').value;
+		
+		if (beforeDate) {
+			extendedQueryParameters.push(`before:${beforeDate}`);
+		}
+
+		if (afterDate) {
+			extendedQueryParameters.push(`after:${afterDate}`);
+		}
 	}
 
 	if (!isTypeInputEnabled()) {
 		queryParameters.set('filetype', selectors.get('type').value);
 	} else {
-		let textContains = splitAndTrim(inputs.get('type').value);
-		[include, exclude] = splitIncludeAndExclude(textContains);
-		include = include.map(encodeURIWithoutSpaces).map(enquotePhrase).map(prependStringFunc('filetype:')).join('+OR+');
-		exclude = exclude.map(encodeURIWithoutSpaces).map(trimLeftMinus).map(enquotePhrase).map(prependStringFunc('-filetype:')).join('+');
-
-		extendedQueryParameters.set('filetype', include);
-		extendedQueryParameters.set('-filetype', exclude);
+		let filetypeList = splitAndTrim(inputs.get('type').value);
+		extendedQueryParameters.push(prependKeywordToEachPhrase(filetypeList, 'filetype:', '+OR+', '+', '+'));
 	}
 
-	let parameters = [];
-	extendedQueryParameters.forEach((value, key, map) => {
-		if (value) {
-			if (['inurl', '-inurl', 'intext', '-intext', 'intitle', '-intitle', 'filetype', '-filetype'].includes(key)) { // rework
-				parameters.push(value);
-			} else {
-				parameters.push(`${key}:${value}`);
-			}
-		} 
-	});
-	let extendedQuery = parameters.join('+');
-	queryParameters.set('q', extendedQuery);
+	queryParameters.set('q', extendedQueryParameters.join('+'));
 
 	parameters = [];
 	queryParameters.forEach((value, key, map) => {
@@ -388,7 +358,7 @@ function saveLocalStorage() {
 	checkboxes.forEach((element, key, map) => {
 		let localKey = `checkbox-${key}`;
 
-		// localStorage can store only strings. "false" evaluates as true because the string is not empty
+		// localStorage can store only strings. "false" evaluates as true because string is not empty
 		// here, existence of value is 'true', its absence is 'false'
 		if (element.checked) {
 			localStorage.setItem(localKey, true);
