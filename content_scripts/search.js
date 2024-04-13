@@ -349,30 +349,52 @@ function isTypeInputEnabled() {
 
 function loadLocalStorage() {
 	inputs.forEach((element, key, map) => {
-		// if local storage for key is empty, we retain previous value
-		element.value = localStorage.getItem(key) || element.value;
+		let storedValue =  localStorage.getItem(`input-${key}`);
+		if (storedValue) {
+			element.value = storedValue;
+		}
 	});
 
 	selectors.forEach((element, key, map) => {
-		element.fstdropdown.setValue(localStorage.getItem(key) || element.value);
+		let storedValue =  localStorage.getItem(`selector-${key}`);
+		if (storedValue) {
+			element.fstdropdown.setValue(storedValue);
+		}
 	});
 
 	checkboxes.forEach((element, key, map) => {
-		element.value = localStorage.getItem(key) || element.value;
+		let storedValue =  localStorage.getItem(`checkbox-${key}`);
+		if (storedValue) {
+			element.checked = true;
+		} else {
+			element.checked = false;
+		}
+
+		// triggering onChange manually
+		const event = new Event("change");
+    	element.dispatchEvent(event);
 	});
 }
 
 function saveLocalStorage() {
 	inputs.forEach((element, key, map) => {
-		localStorage.setItem(key, element.value);
+		localStorage.setItem(`input-${key}`, element.value);
 	});
 
 	selectors.forEach((element, key, map) => {
-		localStorage.setItem(key, element.value);
+		localStorage.setItem(`selector-${key}`, element.value);
 	});
 
 	checkboxes.forEach((element, key, map) => {
-		localStorage.setItem(key, element.value);
+		let localKey = `checkbox-${key}`;
+
+		// localStorage can store only strings. "false" evaluates as true because the string is not empty
+		// here, existence of value is 'true', its absence is 'false'
+		if (element.checked) {
+			localStorage.setItem(localKey, true);
+		} else {
+			localStorage.removeItem(localKey);
+		}
 	});
 }
 
