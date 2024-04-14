@@ -16,8 +16,7 @@
     cursor: pointer;
     background: white;
     overflow: hidden;
-    width: inherit;
-    padding: 1px 0px 0px 0px;
+    width: inherit
 }
     .fstdiv.open > .fstdropdown{
         position: absolute;
