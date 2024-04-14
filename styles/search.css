@@ -23,7 +23,7 @@
 }
 
 .looking-glass {
-  color: #ffcb00;
+  color: #ff8300;
   height: 24px;
   width: 24px;
   margin: auto;
@@ -35,14 +35,14 @@
 
 .separator {
   display: block;
-  border-left: 1px solid #5f6368;
+  border-left: 1px solid #dadce0;
   height: 65%;
 }
 
 /* dropdown styles */
 
 .search-dropdown-container {
-  background: #303134;
+  background: #fff;
   border-radius: 24px;
   box-shadow: 0px 4px 6px rgba(32,33,36,0.28);
   margin-left: -4px;
@@ -52,7 +52,7 @@
   width: 150%;
   z-index: 989;
   display: none;
-  border: 1px solid rgb(32,33,36);
+  border: 1px solid #c0c0c0;
 }
 
 .search-dropdown-inner {
@@ -71,7 +71,7 @@
 }
 
 .search-dropdown-header {
-  color: rgb(241,243,244);
+  color: rgb(32,33,36);
   font-family: "Google Sans Display",Roboto,Arial,sans-serif;
   font-size: 16px;
   line-height: 28px;
@@ -81,8 +81,8 @@
 }
 
 .search-dropdown-content {
-  background: rgb(32,33,36);
-  border: 1px solid rgb(60,64,67);
+  background: rgb(248,249,250);
+  border: 1px solid #c0c0c0;
   border-radius: 8px;
   box-sizing: border-box;
   display: grid;
@@ -107,9 +107,8 @@
 }
 
 .search-dropdown-input-field {
-  background-color: #303134;
-  border: 1px solid rgb(60,64,67);
-  color: rgb(241,243,244);
+  background-color: #fff;
+  border: 1px solid #ccc;
   border-radius: 4px;
   display: -moz-inline-box;
   display: inline-flex;
@@ -138,10 +137,10 @@
 }
 
 .search-dropdown-button {
-  background: #303134;
+  background: #fff;
   border-radius: 32px;
-  border: 1px solid rgb(60,64,67);
-  color: rgb(138,180,248);
+  border: 1px solid rgb(218,220,224);
+  color: rgb(26,115,232);
   cursor: pointer;
   display: -moz-inline-box;
   display: inline-flex;
@@ -158,40 +157,96 @@
   right: 15px;
 }
 
+.search-dropdown-button:hover{
+  background-color: rgba(25,103,210,0.08);
+}
+
 .label-checkbox {
   margin-top: 0px;
   margin-bottom: 0px;
 }
 
-.dark .fstdropdown {
-  background-color: #303134;
-  border: 1px solid rgb(60,64,67)
+.custom-dropdown .fstdropdown > .fstselected {
+    color: #000;
 }
 
-.dark .fstdropdown > .fstselected {
-    color: #fff;
+.custom-dropdown .fstlist > div {
+  border-color: #ccc;
 }
 
-.dark .fstsearchinput {
-   background-color: rgb(32,33,36);
-   color: #fff;
-}
-
-.dark .fstdropdown.open:hover{
-    border-color: rgb(204,204,204);
-    overflow-x: hidden;
-    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(204,204,204,.6);
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(204,204,204,.6);
-}
-
-.dark .fstlist > div {
-    border-bottom: 1px solid rgb(60,64,67);
-}
-
-.search-dropdown-input .fstdropdown {
+.custom-dropdown .fstdropdown {
   padding: 1px 0px 1px 0px;
   box-sizing: border-box;
-  height: 35px;  
+}
+
+/* dark mode colors */
+@media (prefers-color-scheme: dark) {
+  .looking-glass {
+    color: #ffcb00
+  }
+
+  .separator {
+    border-color: #5f6368;
+  }
+
+  .search-dropdown-container {
+    background-color: #303134;
+    border-color: rgb(32,33,36);
+  }
+
+  .search-dropdown-header {
+    color: rgb(241,243,244);
+  }
+
+  .search-dropdown-content {
+    background-color: rgb(32,33,36);
+    border-color: rgb(60,64,67);
+  }
+
+  .search-dropdown-input-field {
+    background-color: #303134;
+    border-color: rgb(60,64,67);
+    color: rgb(241,243,244);
+  }
+  
+  .search-dropdown-button {
+    background-color: #303134;
+    border-color: rgb(60,64,67);
+    color: rgb(138,180,248);
+  }
+
+  .search-dropdown-button:hover{
+    background-color: rgba(110, 160, 229, 0.08);
+  }
+
+  .custom-dropdown .fstdropdown > .fstselected {
+    color: #fff;
+  }
+
+  .custom-dropdown .fstsearchinput {
+    color: #fff;
+  }
+
+  .custom-dropdown .fstdropdown {
+    background-color: #303134;
+    border: 1px solid rgb(60,64,67)
+  }
+
+  .custom-dropdown .fstsearchinput {
+     background-color: rgb(32,33,36);
+     color: #000;
+  }
+  
+  .custom-dropdown .fstdropdown.open:hover{
+      border-color: rgb(204,204,204);
+      overflow-x: hidden;
+      -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(204,204,204,.6);
+      box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(204,204,204,.6);
+  }
+  
+  .custom-dropdown .fstlist > div {
+      border-bottom: 1px solid rgb(60,64,67);
+  }
 }
 
 .column-1 {

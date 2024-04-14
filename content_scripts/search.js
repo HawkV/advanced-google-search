@@ -69,7 +69,7 @@ let searchDropdown = `
 			</div>	
 			<div class="search-dropdown-input column-2 row-2">
 				<label class="search-dropdown-input-label" for="search-dropdown-input-field">Language:</label>
-				<div class="dark">
+				<div class="custom-dropdown">
 					<select class='fstdropdown-select' id='language-select'>
 					</select> 	
 				</div>
@@ -77,14 +77,14 @@ let searchDropdown = `
 			<div class="search-dropdown-input column-2 row-3">
 				<label class="search-dropdown-input-label" for="search-dropdown-input-field">Region:</label>
 
-				<div class="dark">
+				<div class="custom-dropdown">
 					<select class='fstdropdown-select' id='region-select'>
 					</select> 	
 				</div>	
 			</div>
 			<div class="search-dropdown-input column-2 row-4">
 				<label class="search-dropdown-input-label" for="search-dropdown-input-field">Last update (<input type=checkbox class="label-checkbox" id="date-checkbox"> Use date range instead):</label>
-				<div class="dark" id="date-dropdown">
+				<div class="custom-dropdown" id="date-dropdown">
 					<select class='fstdropdown-select' id='period-select'>
 					</select> 	
 				</div>					
@@ -96,14 +96,14 @@ let searchDropdown = `
 			</div>			
 			<div class="search-dropdown-input column-2 row-5">
 				<label class="search-dropdown-input-label" for="search-dropdown-input-field">Terms appearing:</label>
-				<div class="dark">
+				<div class="custom-dropdown">
 					<select class='fstdropdown-select' id='terms-select'> 
 					</select> 	
 				</div>	
 			</div>			
 			<div class="search-dropdown-input column-2 row-6">
 				<label class="search-dropdown-input-label" for="search-dropdown-input-field">File type (<input type=checkbox class="label-checkbox" id="type-checkbox"> Use type list input instead):</label>
-				<div class="dark" id="type-dropdown">
+				<div class="custom-dropdown" id="type-dropdown">
 					<select class='fstdropdown-select' id='type-select'> 
 					</select> 	
 				</div>		
