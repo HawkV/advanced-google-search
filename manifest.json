@@ -1,24 +1,18 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Advanced Google Search",
   "version": "1.0",
-
-  "description": "Adds a button to Google Search that allows you to use advanced search options from the main page",
-
+  "description": "Adds a button to Google Search that allows you to use advanced search options from the search page",
   "icons": {
     "48": "icons/border-48.png"
   },
 
   "content_scripts": [
     {
-      "matches": ["*://*.google.com/*"],
-      "js": ["content_scripts/fstdropdown.js", "content_scripts/dropdowndata.js", "content_scripts/search.js"],
-      "css": ["styles/search.css", "styles/fstdropdown.css"]
+      "matches": ["https://*.google.com/*"],
+      "css": ["styles/search.css", "styles/fstdropdown.css"],
+      "js": ["content_scripts/fstdropdown.js", "content_scripts/dropdowndata.js", "content_scripts/search.js"]
     }
-  ],
-
-  "web_accessible_resources": [
-    "search.css"
   ]
 }
 

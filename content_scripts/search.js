@@ -31,27 +31,27 @@ let searchDropdown = `
 		</div>
 		<div class="search-dropdown-header">Advanced Google Search </div>
 		<div class="search-dropdown-content">
-			<div class="search-dropdown-input column-1">
-				<label class="search-dropdown-input-label" for="search-dropdown-input-field">All these words or phrases (write -word to exclude it):</label>
+			<div class="search-dropdown-input">
+				<label class="search-dropdown-input-label" for="search-dropdown-input-field">All these words or phrases (-word excludes it):</label>
 				<input autocomplete="false" autocorrect="false" id="all-phrases-input" text="text" class="search-dropdown-input-field" placeholder="Comma-separated list of words and phrases">	
 			</div>			
-			<div class="search-dropdown-input column-1">
+			<div class="search-dropdown-input">
 				<label class="search-dropdown-input-label" for="search-dropdown-input-field">Any of these words or phrases:</label>
 				<input autocomplete="false" autocorrect="false" id="any-phrases-input" text="text" class="search-dropdown-input-field" placeholder="Comma-separated list of words and phrases">	
 			</div>					
-			<div class="search-dropdown-input column-1">
+			<div class="search-dropdown-input">
 				<label class="search-dropdown-input-label" for="search-dropdown-input-field">URL contains:</label>
 				<input autocomplete="false" autocorrect="false" id="url-input" text="text" class="search-dropdown-input-field" placeholder="Comma-separated list of words">	
 			</div>					
-			<div class="search-dropdown-input column-1">
+			<div class="search-dropdown-input">
 				<label class="search-dropdown-input-label" for="search-dropdown-input-field">Title contains:</label>
 				<input autocomplete="false" autocorrect="false" id="title-input" text="text" class="search-dropdown-input-field" placeholder="Comma-separated list of words and phrases">	
 			</div>					
-			<div class="search-dropdown-input column-1">
+			<div class="search-dropdown-input">
 				<label class="search-dropdown-input-label" for="search-dropdown-input-field">Text contains:</label>
 				<input autocomplete="false" autocorrect="false" id="text-input" text="text" class="search-dropdown-input-field" placeholder="Comma-separated list of words and phrases">	
 			</div>			
-			<div class="search-dropdown-input column-1">
+			<div class="search-dropdown-input">
 				<label class="search-dropdown-input-label" for="search-dropdown-input-field">Numbers ranging from:</label>
 				<div style="display: flex;">
 					<input autocomplete="false" id="lower-bound-input" autocorrect="false" text="number" class="search-dropdown-input-field short" placeholder="Lower bound">		
@@ -63,18 +63,18 @@ let searchDropdown = `
 
 			<!-- next column -->
 
-			<div class="search-dropdown-input column-2 row-1">
+			<div class="search-dropdown-input">
 				<label class="search-dropdown-input-label" for="search-dropdown-input-field">Site or domain:</label>
 				<input autocomplete="false" autocorrect="false" id="domain-input" text="text" class="search-dropdown-input-field" placeholder="Domain name">	
 			</div>	
-			<div class="search-dropdown-input column-2 row-2">
+			<div class="search-dropdown-input">
 				<label class="search-dropdown-input-label" for="search-dropdown-input-field">Language:</label>
 				<div class="custom-dropdown">
 					<select class='fstdropdown-select' id='language-select'>
 					</select> 	
 				</div>
 			</div>			
-			<div class="search-dropdown-input column-2 row-3">
+			<div class="search-dropdown-input">
 				<label class="search-dropdown-input-label" for="search-dropdown-input-field">Region:</label>
 
 				<div class="custom-dropdown">
@@ -82,7 +82,7 @@ let searchDropdown = `
 					</select> 	
 				</div>	
 			</div>
-			<div class="search-dropdown-input column-2 row-4">
+			<div class="search-dropdown-input">
 				<label class="search-dropdown-input-label" for="search-dropdown-input-field">Last update (<input type=checkbox class="label-checkbox" id="date-checkbox"> Use date range instead):</label>
 				<div class="custom-dropdown" id="date-dropdown">
 					<select class='fstdropdown-select' id='period-select'>
@@ -94,14 +94,14 @@ let searchDropdown = `
 					<input type="date" autocomplete="false" id="before-date-input" autocorrect="false" text="text" class="search-dropdown-input-field short right">
 				</div>	
 			</div>			
-			<div class="search-dropdown-input column-2 row-5">
+			<div class="search-dropdown-input">
 				<label class="search-dropdown-input-label" for="search-dropdown-input-field">Terms appearing:</label>
 				<div class="custom-dropdown">
 					<select class='fstdropdown-select' id='terms-select'> 
 					</select> 	
 				</div>	
 			</div>			
-			<div class="search-dropdown-input column-2 row-6">
+			<div class="search-dropdown-input">
 				<label class="search-dropdown-input-label" for="search-dropdown-input-field">File type (<input type=checkbox class="label-checkbox" id="type-checkbox"> Use type list input instead):</label>
 				<div class="custom-dropdown" id="type-dropdown">
 					<select class='fstdropdown-select' id='type-select'> 
@@ -109,7 +109,7 @@ let searchDropdown = `
 				</div>		
 				<input autocomplete="false" autocorrect="false" id="type-input" text="text" class="search-dropdown-input-field" id="type-input" style="display:none" placeholder="Comma-separated list of file types">
 			</div>		
-			<div class="search-dropdown-button-container column-2 row-7">
+			<div class="search-dropdown-button-container last-column">
 				<div class="search-dropdown-button" id="search-dropdown-button" tabindex="0" role="button">Advanced Search</div>
 			</div>
 		</div>
