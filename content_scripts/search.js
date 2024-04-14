@@ -166,7 +166,8 @@ function encodeURIWithoutSpaces(element) {
 	return encodeURIComponent(element).replaceAll('%20', '+');
 }
 
-function enquotePhrase(element) {
+// to use only on encoded words and phrases; it checks for '+' as word separator
+function enquoteEncodedPhrase(element) {
 	if (element.includes('+')) {
 		return `"${element}"`;
 	}
@@ -183,13 +184,19 @@ function prependStringFunc(string) {
 }
 
 function trimLeftMinus(element) {
-	return element.replace('-', '');
+	if (element.startsWith('-')) {
+		// .replace replaces the first occurrence of an element
+		return element.replace('-', '');
+	}
+
+	return element;
 }
 
-function prependKeywordToEachPhrase(phrases, keyword, includeSeparator, excludeSeparator, overallSeparator) {
+function prependKeywordToEachPhrase(data, keyword, includeSeparator, excludeSeparator, overallSeparator) {
+	phrases = splitAndTrim(data);
 	[include, exclude] = separateIncludeAndExclude(phrases);
-	include = include.map(encodeURIWithoutSpaces).map(enquotePhrase).map(prependStringFunc(`${keyword}`)).join(includeSeparator);
-	exclude = exclude.map(encodeURIWithoutSpaces).map(trimLeftMinus).map(enquotePhrase).map(prependStringFunc(`-${keyword}`)).join(excludeSeparator);
+	include = include.map(encodeURIWithoutSpaces).map(enquoteEncodedPhrase).map(prependStringFunc(`${keyword}`)).join(includeSeparator);
+	exclude = exclude.map(encodeURIWithoutSpaces).map(trimLeftMinus).map(enquoteEncodedPhrase).map(prependStringFunc(`-${keyword}`)).join(excludeSeparator);
 	return `${include}${overallSeparator}${exclude}`;
 }
 
@@ -214,36 +221,34 @@ function onSearchButtonClick() {
 
 	let extendedQueryParameters = [];
 
-	let allPhrases = splitAndTrim(inputs.get('all-phrases').value);
-	let q = prependKeywordToEachPhrase(allPhrases, '', '+', '+', '+'); // trivial case of no actual keyword
-	queryParameters.set('as_q', q);
+	let allPhrases = getSanitizedValue(inputs, 'all-phrases');
+	queryParameters.set('as_q', prependKeywordToEachPhrase(allPhrases, '', '+', '+', '+')); // trivial case of no actual keyword
 
-	let anyPhrases = splitAndTrim(inputs.get('any-phrases').value);
-	anyPhrases = anyPhrases.map(encodeURIWithoutSpaces).map(enquotePhrase).join('+');
-	queryParameters.set('as_oq', anyPhrases);
+	let anyPhrases = getSanitizedValue(inputs, 'any-phrases');
+	queryParameters.set('as_oq', prependKeywordToEachPhrase(anyPhrases, '', '+', '+', '+'));
 
-	let urlContains = splitAndTrim(inputs.get('url').value);
+	let urlContains = getSanitizedValue(inputs, 'url');
 	extendedQueryParameters.push(prependKeywordToEachPhrase(urlContains, 'inurl:', '+', '+', '+'));
 
-	let titleContains = splitAndTrim(inputs.get('title').value);
+	let titleContains = getSanitizedValue(inputs, 'title');
 	extendedQueryParameters.push(prependKeywordToEachPhrase(titleContains, 'intitle:', '+', '+', '+'));
 
-	let textContains = splitAndTrim(inputs.get('text').value);
+	let textContains = getSanitizedValue(inputs, 'text');
 	extendedQueryParameters.push(prependKeywordToEachPhrase(textContains, 'intext:', '+', '+', '+'));
 
-	queryParameters.set('as_nlo', inputs.get('lower-bound').value);
-	queryParameters.set('as_nhi', inputs.get('upper-bound').value);
-	queryParameters.set('as_sitesearch', inputs.get('domain').value);
+	queryParameters.set('as_nlo', getSanitizedValue(inputs, 'lower-bound'));
+	queryParameters.set('as_nhi', getSanitizedValue(inputs, 'upper-bound'));
+	queryParameters.set('as_sitesearch', getSanitizedValue(inputs, 'domain'));
 
-	queryParameters.set('lr', selectors.get('language').value);
-	queryParameters.set('cr', selectors.get('region').value);
-	queryParameters.set('as_occt', selectors.get('terms').value);
+	queryParameters.set('lr', getSanitizedValue(selectors, 'language'));
+	queryParameters.set('cr', getSanitizedValue(selectors, 'region'));
+	queryParameters.set('as_occt', getSanitizedValue(selectors, 'terms'));
 
 	if (!isDatePickerEnabled()) {
-		queryParameters.set('as_qdr', selectors.get('period').value);
+		queryParameters.set('as_qdr', getSanitizedValue(selectors, 'period'));
 	} else {
-		let beforeDate = inputs.get('before-date').value;
-		let afterDate = inputs.get('after-date').value;
+		let beforeDate = getSanitizedValue(inputs, 'before-date');
+		let afterDate = getSanitizedValue(inputs, 'after-date');
 		
 		if (beforeDate) {
 			extendedQueryParameters.push(`before:${beforeDate}`);
@@ -255,9 +260,9 @@ function onSearchButtonClick() {
 	}
 
 	if (!isTypeInputEnabled()) {
-		queryParameters.set('filetype', selectors.get('type').value);
+		queryParameters.set('filetype', getSanitizedValue(selectors, 'type'));
 	} else {
-		let filetypeList = splitAndTrim(inputs.get('type').value);
+		let filetypeList = getSanitizedValue(inputs, 'type');
 		extendedQueryParameters.push(prependKeywordToEachPhrase(filetypeList, 'filetype:', '+OR+', '+', '+'));
 	}
 
@@ -310,49 +315,45 @@ function enableTypeInput(status) {
 }
 
 function isDatePickerEnabled() {
-	return checkboxes.get('date').checked;
+	return checkboxes.get('date').getValue();
 }
 
 function isTypeInputEnabled() {
-	return checkboxes.get('type').checked;
+	return checkboxes.get('type').getValue();
 }
 
 function loadLocalStorage() {
 	inputs.forEach((element, key, map) => {
 		let storedValue =  localStorage.getItem(`input-${key}`);
 		if (storedValue) {
-			element.value = storedValue;
+			element.setValue(storedValue);
 		}
 	});
 
 	selectors.forEach((element, key, map) => {
 		let storedValue =  localStorage.getItem(`selector-${key}`);
 		if (storedValue) {
-			element.fstdropdown.setValue(storedValue);
+			element.setValue(storedValue);
 		}
 	});
 
 	checkboxes.forEach((element, key, map) => {
 		let storedValue =  localStorage.getItem(`checkbox-${key}`);
 		if (storedValue) {
-			element.checked = true;
+			element.setValue(true);
 		} else {
-			element.checked = false;
+			element.setValue(false);
 		}
-
-		// triggering onChange manually
-		const event = new Event("change");
-    	element.dispatchEvent(event);
 	});
 }
 
 function saveLocalStorage() {
 	inputs.forEach((element, key, map) => {
-		localStorage.setItem(`input-${key}`, element.value);
+		localStorage.setItem(`input-${key}`, element.getValue());
 	});
 
 	selectors.forEach((element, key, map) => {
-		localStorage.setItem(`selector-${key}`, element.value);
+		localStorage.setItem(`selector-${key}`, element.getValue());
 	});
 
 	checkboxes.forEach((element, key, map) => {
@@ -360,12 +361,37 @@ function saveLocalStorage() {
 
 		// localStorage can store only strings. "false" evaluates as true because string is not empty
 		// here, existence of value is 'true', its absence is 'false'
-		if (element.checked) {
+		if (element.getValue()) {
 			localStorage.setItem(localKey, true);
 		} else {
 			localStorage.removeItem(localKey);
 		}
 	});
+}
+
+function getSanitizedValue(inputCollection, key) {
+	let inputData = inputCollection.get(key);
+	if (!inputData) {
+		return '';
+	}
+
+	let value = inputData.getValue();
+
+	if (inputData.sanitizer) {
+		return inputData.sanitizer(value);
+	}
+
+	return value;
+}
+
+function typeInputSanitizer(value) {
+	// removes all dots from file types
+	return value.replaceAll('.', '');
+}
+
+function numericalInputSanitizer(value) {
+	// removes all non-numeric characters except . and ,
+	return value.replaceAll(/[^0-9.,]/gi, '');
 }
 
 let inputs = new Map([
@@ -374,10 +400,10 @@ let inputs = new Map([
 	['url', {}],
 	['title', {}],
 	['text', {}],
-	['lower-bound', {}],
-	['upper-bound', {}],
+	['lower-bound', {sanitizer: numericalInputSanitizer}],
+	['upper-bound', {sanitizer: numericalInputSanitizer}],
 	['domain', {}],
-	['type', {}],
+	['type', {sanitizer: typeInputSanitizer}],
 	['after-date', {}],
 	['before-date', {}],
 ]);
@@ -416,26 +442,44 @@ function main() {
 	 */
 
 	inputs.forEach((value, key, map) => {
-		map.set(key, document.getElementById(`${key}-input`));
+		let data = map.get(key);
+		data.htmlElement = document.getElementById(`${key}-input`);
+
+		data.getValue = () => data.htmlElement.value;
+		data.setValue = (value) => data.htmlElement.value = value;
 	});
 
 	selectors.forEach((value, key, map) => {
-		map.set(key, document.getElementById(`${key}-select`));
+		let data = map.get(key);
+		data.htmlElement = document.getElementById(`${key}-select`);
+
+		data.getValue = () => data.htmlElement.value;
+		data.setValue = data.htmlElement.fstdropdown.setValue;
 	});
 
 	checkboxes.forEach((value, key, map) => {
-		map.set(key, document.getElementById(`${key}-checkbox`));
+		let data = map.get(key);
+		data.htmlElement = document.getElementById(`${key}-checkbox`);
+
+		data.getValue = () => data.htmlElement.checked;
+		data.setValue = (value) => {
+			data.htmlElement.checked = value;
+			
+			// triggering onChange manually
+			const event = new Event("change");
+			data.htmlElement.dispatchEvent(event);
+		};
 	});
 
 	/**
 	 * adding event handlers
 	 */
 
-	checkboxes.get('date').addEventListener("change", (event) => {
+	checkboxes.get('date').htmlElement.addEventListener("change", (event) => {
 		enableDatePicker(event.currentTarget.checked);
 	});
 
-	checkboxes.get('type').addEventListener("change", (event) => {
+	checkboxes.get('type').htmlElement.addEventListener("change", (event) => {
 		enableTypeInput(event.currentTarget.checked);
 	});
 
