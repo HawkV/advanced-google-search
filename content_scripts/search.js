@@ -260,7 +260,7 @@ function onSearchButtonClick() {
 	}
 
 	if (!isTypeInputEnabled()) {
-		queryParameters.set('filetype', getSanitizedValue(selectors, 'type'));
+		queryParameters.set('as_filetype', getSanitizedValue(selectors, 'type'));
 	} else {
 		let filetypeList = getSanitizedValue(inputs, 'type');
 		extendedQueryParameters.push(prependKeywordToEachPhrase(filetypeList, 'filetype:', '+OR+', '+', '+'));
