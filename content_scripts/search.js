@@ -83,12 +83,14 @@ let searchDropdown = `
 				</div>	
 			</div>
 			<div class="search-dropdown-input">
-				<label class="search-dropdown-input-label" for="search-dropdown-input-field">Last update (<input type=checkbox class="label-checkbox" id="date-checkbox"> Use date range instead):</label>
+				<label for="search-dropdown-input-field">Last update:</label> 
+				<input type=checkbox id="date-checkbox" class="inline-checkbox"> 
+				<label>Use date range</label>
 				<div class="custom-dropdown" id="date-dropdown">
 					<select class='fstdropdown-select' id='period-select'>
 					</select> 	
 				</div>					
-				<div style="display: none;" id="date-picker">
+				<div id="date-picker">
 					<input type="date" autocomplete="false" id="after-date-input" autocorrect="false" text="text" class="search-dropdown-input-field short">		
 					<div style="padding: 10px">-</div> 			
 					<input type="date" autocomplete="false" id="before-date-input" autocorrect="false" text="text" class="search-dropdown-input-field short right">
@@ -102,12 +104,14 @@ let searchDropdown = `
 				</div>	
 			</div>			
 			<div class="search-dropdown-input">
-				<label class="search-dropdown-input-label" for="search-dropdown-input-field">File type (<input type=checkbox class="label-checkbox" id="type-checkbox"> Use type list input instead):</label>
+				<label for="search-dropdown-input-field">File type:</label>
+				<input type=checkbox class="inline-checkbox" id="type-checkbox">
+				<label>Use type list input</label>
 				<div class="custom-dropdown" id="type-dropdown">
 					<select class='fstdropdown-select' id='type-select'> 
 					</select> 	
 				</div>		
-				<input autocomplete="false" autocorrect="false" id="type-input" text="text" class="search-dropdown-input-field" id="type-input" style="display:none" placeholder="Comma-separated list of file types">
+				<input autocomplete="false" autocorrect="false" id="type-input" text="text" class="search-dropdown-input-field" id="type-input" placeholder="Comma-separated list of file types">
 			</div>		
 			<div class="search-dropdown-button-container last-column">
 				<div class="search-dropdown-button" id="search-dropdown-button" tabindex="0" role="button">Advanced Search</div>
@@ -141,6 +145,15 @@ function onSearchClick() {
 
 function onCloseClick() {
 	enableDropdown(false);
+}
+
+function enableDropdown(status) {
+	let searchDropdown = document.getElementById('search-dropdown-container');
+	if (status == true) {
+		searchDropdown.style.display = "block";
+	} else {
+		searchDropdown.style.display = "none";
+	}
 }
 
 function splitAndTrim(value) {
@@ -197,7 +210,16 @@ function prependKeywordToEachPhrase(data, keyword, includeSeparator, excludeSepa
 	[include, exclude] = separateIncludeAndExclude(phrases);
 	include = include.map(encodeURIWithoutSpaces).map(enquoteEncodedPhrase).map(prependStringFunc(`${keyword}`)).join(includeSeparator);
 	exclude = exclude.map(encodeURIWithoutSpaces).map(trimLeftMinus).map(enquoteEncodedPhrase).map(prependStringFunc(`-${keyword}`)).join(excludeSeparator);
-	return `${include}${overallSeparator}${exclude}`;
+	
+	if (!include) {
+		return exclude;
+	}
+
+	if (!exclude) {
+		return include;
+	}
+	
+	return `${include}${overallSeparator}${exclude}`; // we glue data back together only if both exclude and include are not empty
 }
 
 function onSearchButtonClick() {
@@ -266,7 +288,7 @@ function onSearchButtonClick() {
 		extendedQueryParameters.push(prependKeywordToEachPhrase(filetypeList, 'filetype:', '+OR+', '+', '+'));
 	}
 
-	queryParameters.set('q', extendedQueryParameters.join('+'));
+	queryParameters.set('q', extendedQueryParameters.filter((element) => element).join('+'));
 
 	parameters = [];
 	queryParameters.forEach((value, key, map) => {
@@ -277,41 +299,6 @@ function onSearchButtonClick() {
 	let query = `https://www.google.com/search?${mergedParameters}`;
 
 	document.location=query;
-}
-
-function enableDropdown(status) {
-	let searchDropdown = document.getElementById('search-dropdown-container');
-	if (status == true) {
-		searchDropdown.style.display = "block";
-	} else {
-		searchDropdown.style.display = "none";
-	}
-}
-
-function enableDatePicker(status) {
-	let dateDropdown = document.getElementById('date-dropdown');
-	let datePicker = document.getElementById('date-picker');
-
-	if (status == true) {
-		dateDropdown.style.display = "none";
-		datePicker.style.display = "flex";
-	} else {
-		dateDropdown.style.display = "block";
-		datePicker.style.display = "none";
-	}
-}
-
-function enableTypeInput(status) {
-	let typeDropdown = document.getElementById('type-dropdown');
-	let typeInput = document.getElementById('type-input');
-
-	if (status == true) {
-		typeDropdown.style.display = "none";
-		typeInput.style.display = "block";
-	} else {
-		typeDropdown.style.display = "block";
-		typeInput.style.display = "none";
-	}
 }
 
 function isDatePickerEnabled() {
@@ -462,25 +449,7 @@ function main() {
 		data.htmlElement = document.getElementById(`${key}-checkbox`);
 
 		data.getValue = () => data.htmlElement.checked;
-		data.setValue = (value) => {
-			data.htmlElement.checked = value;
-			
-			// triggering onChange manually
-			const event = new Event("change");
-			data.htmlElement.dispatchEvent(event);
-		};
-	});
-
-	/**
-	 * adding event handlers
-	 */
-
-	checkboxes.get('date').htmlElement.addEventListener("change", (event) => {
-		enableDatePicker(event.currentTarget.checked);
-	});
-
-	checkboxes.get('type').htmlElement.addEventListener("change", (event) => {
-		enableTypeInput(event.currentTarget.checked);
+		data.setValue = (value) => data.htmlElement.checked = value;
 	});
 
 	document.getElementById('search-button').onclick = onSearchClick;
