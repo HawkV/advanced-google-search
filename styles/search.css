@@ -23,7 +23,7 @@
 }
 
 .looking-glass {
-  color: #ff8300;
+  color: rgb(255, 131, 0);
   height: 24px;
   width: 24px;
   margin: auto;
@@ -35,14 +35,14 @@
 
 .separator {
   display: block;
-  border-left: 1px solid #dadce0;
+  border-left: 1px solid rgb(218, 220, 224);
   height: 65%;
 }
 
 /* dropdown styles */
 
 .search-dropdown-container {
-  background: #fff;
+  background: rgb(255, 255, 255);
   border-radius: 24px;
   box-shadow: 0px 4px 6px rgba(32,33,36,0.28);
   margin-left: -4px;
@@ -50,9 +50,13 @@
   position: absolute;
   top: -4px;
   width: 150%;
-  z-index: 989;
+  z-index: 1000;
   display: none;
-  border: 1px solid #c0c0c0;
+  border: 1px solid rgb(223, 225, 229);
+}
+
+.search-dropdown-container * {
+  font-family: "Google Sans Display",Roboto,Arial,sans-serif;
 }
 
 .search-dropdown-inner {
@@ -62,7 +66,6 @@
 .search-dropdown-close {
   align-self: flex-end;
   cursor: pointer;
-  display: -moz-box;
   display: flex;
   padding: 14px;
   position: absolute;
@@ -72,7 +75,6 @@
 
 .search-dropdown-header {
   color: rgb(32,33,36);
-  font-family: "Google Sans Display",Roboto,Arial,sans-serif;
   font-size: 16px;
   line-height: 28px;
   margin-bottom: 10px;
@@ -82,13 +84,12 @@
 
 .search-dropdown-content {
   background: rgb(248,249,250);
-  border: 1px solid #c0c0c0;
+  border: 1px solid rgb(223, 225, 229);
   border-radius: 8px;
   box-sizing: border-box;
   display: grid;
   grid-template-columns: 1fr 1fr;
   flex-direction: column;
-  -moz-box-flex: 1;
   flex-grow: 1;
   position: relative;
   width: 100%;
@@ -117,15 +118,12 @@ html[itemtype="http://schema.org/WebPage"] .search-dropdown-container {
 }
 
 .search-dropdown-input-field {
-  background-color: #fff;
-  border: 1px solid #ccc;
+  background-color: rgb(255, 255, 255);
+  border: 1px solid rgb(204, 204, 204);
   border-radius: 4px;
-  display: -moz-inline-box;
   display: inline-flex;
-  -moz-box-flex: 1;
   flex-grow: 1;
   font-size: 14px;
-  font-family: "Google Sans Display",Roboto,Arial,sans-serif;
   height: 35px;
   width: 100%;
   padding-left: 10px;
@@ -147,17 +145,14 @@ html[itemtype="http://schema.org/WebPage"] .search-dropdown-container {
 }
 
 .search-dropdown-button {
-  background: #fff;
+  background: rgb(255, 255, 255);
   border-radius: 32px;
   border: 1px solid rgb(218,220,224);
   color: rgb(26,115,232);
   cursor: pointer;
-  display: -moz-inline-box;
   display: inline-flex;
   flex-shrink: 0;
-  font-family: "Google Sans",Roboto,Arial,sans-serif;
   font-size: 14px;
-  -moz-box-pack: center;
   justify-content: center;
   letter-spacing: .25px;
   outline: 0;
@@ -177,11 +172,11 @@ html[itemtype="http://schema.org/WebPage"] .search-dropdown-container {
 }
 
 .custom-dropdown .fstdropdown > .fstselected {
-    color: #000;
+    color: rgb(0, 0, 0);
 }
 
 .custom-dropdown .fstlist > div {
-  border-color: #ccc;
+  border-color: rgb(204, 204, 204);
 }
 
 .custom-dropdown .fstdropdown {
@@ -192,15 +187,15 @@ html[itemtype="http://schema.org/WebPage"] .search-dropdown-container {
 /* dark mode colors */
 @media (prefers-color-scheme: dark) {
   .looking-glass {
-    color: #ffcb00
+    color: rgb(255, 203, 0)
   }
 
   .separator {
-    border-color: #5f6368;
+    border-color: rgb(95, 99, 104);
   }
 
   .search-dropdown-container {
-    background-color: #303134;
+    background-color: rgb(48, 49, 52);
     border-color: rgb(32,33,36);
   }
 
@@ -214,13 +209,13 @@ html[itemtype="http://schema.org/WebPage"] .search-dropdown-container {
   }
 
   .search-dropdown-input-field {
-    background-color: #303134;
+    background-color: rgb(48, 49, 52);
     border-color: rgb(60,64,67);
     color: rgb(241,243,244);
   }
   
   .search-dropdown-button {
-    background-color: #303134;
+    background-color: rgb(48, 49, 52);
     border-color: rgb(60,64,67);
     color: rgb(138,180,248);
   }
@@ -230,21 +225,21 @@ html[itemtype="http://schema.org/WebPage"] .search-dropdown-container {
   }
 
   .custom-dropdown .fstdropdown > .fstselected {
-    color: #fff;
+    color: rgb(255, 255, 255);
   }
 
   .custom-dropdown .fstsearchinput {
-    color: #fff;
+    color: rgb(255, 255, 255);
   }
 
   .custom-dropdown .fstdropdown {
-    background-color: #303134;
+    background-color: rgb(48, 49, 52);
     border: 1px solid rgb(60,64,67)
   }
 
   .custom-dropdown .fstsearchinput {
      background-color: rgb(32,33,36);
-     color: #000;
+     color: rgb(0, 0, 0);
   }
   
   .custom-dropdown .fstdropdown.open:hover{
