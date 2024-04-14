@@ -296,9 +296,7 @@ function onSearchButtonClick() {
 	});
 	let mergedParameters = parameters.join('&');
 
-	let query = `https://www.google.com/search?${mergedParameters}`;
-
-	document.location=query;
+	document.location=`https://www.google.com/search?${mergedParameters}`;
 }
 
 function isDatePickerEnabled() {
@@ -311,21 +309,21 @@ function isTypeInputEnabled() {
 
 function loadLocalStorage() {
 	inputs.forEach((element, key, map) => {
-		let storedValue =  localStorage.getItem(`input-${key}`);
+		let storedValue = localStorage.getItem(`input-${key}`);
 		if (storedValue) {
 			element.setValue(storedValue);
 		}
 	});
 
 	selectors.forEach((element, key, map) => {
-		let storedValue =  localStorage.getItem(`selector-${key}`);
+		let storedValue = localStorage.getItem(`selector-${key}`);
 		if (storedValue) {
 			element.setValue(storedValue);
 		}
 	});
 
 	checkboxes.forEach((element, key, map) => {
-		let storedValue =  localStorage.getItem(`checkbox-${key}`);
+		let storedValue = localStorage.getItem(`checkbox-${key}`);
 		if (storedValue) {
 			element.setValue(true);
 		} else {
