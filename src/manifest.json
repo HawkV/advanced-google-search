@@ -13,6 +13,14 @@
       "css": ["styles/search.css", "styles/fstdropdown.css"],
       "js": ["content_scripts/fstdropdown.js", "content_scripts/dropdowndata.js", "content_scripts/search.js"]
     }
-  ]
+  ],
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "@advanced-google-search",
+      "strict_min_version": "100.0",
+      "update_url": "https://raw.githubusercontent.com/HawkV/advanced-google-search/main/update.json"
+    }
+  }
 }
 

@@ -406,18 +406,27 @@ let checkboxes = new Map([
 	['type', {}]
 ]);
 
+function appendChildAsHTML(element, html) {
+	element.innerHTML += html;
+}
+
+// append after all the siblings 
+function appendAlongsideAsHTML(element, html) {
+	element.parentElement.innerHTML += html;
+}
+
 function main() {
 	/** 
 	 * updating page's HTML
 	 */
 
 	let searchBar = requireSingleElementWithClass(googleClasses['searchBar'])
-	searchBar.insertAdjacentHTML('beforeend', searchButtonHTML);
-	searchBar.insertAdjacentHTML('afterend', searchDropdown);
+	appendChildAsHTML(searchBar, searchButtonHTML);
+	appendAlongsideAsHTML(searchBar, searchDropdown);
 
 	optionsMap.forEach((value, key, map) => {
 		let select = document.getElementById(`${key}-select`);
-		value.forEach((element) => select.insertAdjacentHTML('beforeend', `<option value="${element.value}">${element.content}</option>`));
+		value.forEach((element) => appendChildAsHTML(select, `<option value="${element.value}">${element.content}</option>`));
 	});
 
 	setFstDropdown();

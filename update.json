@@ -1,0 +1,18 @@
+{
+    "addons": {
+      "@advanced-google-search": {
+        "updates": [
+          {
+            "version": "1.0.0",  
+            "browser_specific_settings": {
+                "gecko": {
+                    "id": "@advanced-google-search",
+                    "strict_min_version": "100.0"
+                }
+            },
+            "update_link": ""
+          }
+        ]
+      }
+    }
+  }
