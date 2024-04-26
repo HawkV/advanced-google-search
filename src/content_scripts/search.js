@@ -1,3 +1,8 @@
+/**
+ * cross-browser namespace support
+ */
+const browser = window.browser || window.chrome;
+
 let googleClasses = {
 	'searchBarContainer': 'A8SBwf',
 	'searchBar': 'RNNXgb'
