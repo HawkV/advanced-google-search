@@ -4,7 +4,7 @@
   "version": "1.0",
   "description": "Adds a button to Google Search that allows you to use advanced search options from the search page",
   "icons": {
-    "48": "icons/border-48.png"
+    "48": "icons/logo.png"
   },
 
   "content_scripts": [
