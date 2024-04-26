@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Advanced Google Search",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Adds a button to Google Search that allows you to use advanced search options from the search page",
   "icons": {
     "48": "icons/logo.png"
@@ -26,7 +26,7 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "@advanced-google-search",
-      "strict_min_version": "100.0",
+      "strict_min_version": "109.0",
       "update_url": "https://raw.githubusercontent.com/HawkV/advanced-google-search/main/update.json"
     }
   }

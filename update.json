@@ -3,11 +3,11 @@
       "@advanced-google-search": {
         "updates": [
           {
-            "version": "1.1.0",  
+            "version": "1.1.1",  
             "browser_specific_settings": {
                 "gecko": {
                     "id": "@advanced-google-search",
-                    "strict_min_version": "100.0"
+                    "strict_min_version": "109.0"
                 }
             },
             "update_link": "https://addons.mozilla.org/firefox/downloads/file/4271959/679b4d8b333740caaa59-1.0.xpi"
