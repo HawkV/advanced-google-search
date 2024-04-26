@@ -247,34 +247,34 @@ function onSearchButtonClick() {
 
 	let extendedQueryParameters = [];
 
-	let allPhrases = getSanitizedValue(inputMap, 'all-phrases');
+	let allPhrases = getSanitizedValue(inputs, 'all-phrases');
 	queryParameters.set('as_q', prependKeywordToEachPhrase(allPhrases, '', '+', '+', '+')); // trivial case of no actual keyword
 
-	let anyPhrases = getSanitizedValue(inputMap, 'any-phrases');
+	let anyPhrases = getSanitizedValue(inputs, 'any-phrases');
 	queryParameters.set('as_oq', prependKeywordToEachPhrase(anyPhrases, '', '+', '+', '+'));
 
-	let urlContains = getSanitizedValue(inputMap, 'url');
+	let urlContains = getSanitizedValue(inputs, 'url');
 	extendedQueryParameters.push(prependKeywordToEachPhrase(urlContains, 'inurl:', '+', '+', '+'));
 
-	let titleContains = getSanitizedValue(inputMap, 'title');
+	let titleContains = getSanitizedValue(inputs, 'title');
 	extendedQueryParameters.push(prependKeywordToEachPhrase(titleContains, 'intitle:', '+', '+', '+'));
 
-	let textContains = getSanitizedValue(inputMap, 'text');
+	let textContains = getSanitizedValue(inputs, 'text');
 	extendedQueryParameters.push(prependKeywordToEachPhrase(textContains, 'intext:', '+', '+', '+'));
 
-	queryParameters.set('as_nlo', getSanitizedValue(inputMap, 'lower-bound'));
-	queryParameters.set('as_nhi', getSanitizedValue(inputMap, 'upper-bound'));
-	queryParameters.set('as_sitesearch', getSanitizedValue(inputMap, 'domain'));
+	queryParameters.set('as_nlo', getSanitizedValue(inputs, 'lower-bound'));
+	queryParameters.set('as_nhi', getSanitizedValue(inputs, 'upper-bound'));
+	queryParameters.set('as_sitesearch', getSanitizedValue(inputs, 'domain'));
 
-	queryParameters.set('lr', getSanitizedValue(selectorMap, 'language'));
-	queryParameters.set('cr', getSanitizedValue(selectorMap, 'region'));
-	queryParameters.set('as_occt', getSanitizedValue(selectorMap, 'terms'));
+	queryParameters.set('lr', getSanitizedValue(selectors, 'language'));
+	queryParameters.set('cr', getSanitizedValue(selectors, 'region'));
+	queryParameters.set('as_occt', getSanitizedValue(selectors, 'terms'));
 
 	if (!isDatePickerEnabled()) {
-		queryParameters.set('as_qdr', getSanitizedValue(selectorMap, 'period'));
+		queryParameters.set('as_qdr', getSanitizedValue(selectors, 'period'));
 	} else {
-		let beforeDate = getSanitizedValue(inputMap, 'before-date');
-		let afterDate = getSanitizedValue(inputMap, 'after-date');
+		let beforeDate = getSanitizedValue(inputs, 'before-date');
+		let afterDate = getSanitizedValue(inputs, 'after-date');
 		
 		if (beforeDate) {
 			extendedQueryParameters.push(`before:${beforeDate}`);
@@ -286,9 +286,9 @@ function onSearchButtonClick() {
 	}
 
 	if (!isTypeInputEnabled()) {
-		queryParameters.set('as_filetype', getSanitizedValue(selectorMap, 'type'));
+		queryParameters.set('as_filetype', getSanitizedValue(selectors, 'type'));
 	} else {
-		let filetypeList = getSanitizedValue(inputMap, 'type');
+		let filetypeList = getSanitizedValue(inputs, 'type');
 		extendedQueryParameters.push(prependKeywordToEachPhrase(filetypeList, 'filetype:', '+OR+', '+', '+'));
 	}
 
@@ -304,17 +304,17 @@ function onSearchButtonClick() {
 }
 
 function isDatePickerEnabled() {
-	return checkboxMap.get('date').getValue();
+	return checkboxes.get('date').getValue();
 }
 
 function isTypeInputEnabled() {
-	return checkboxMap.get('type').getValue();
+	return checkboxes.get('type').getValue();
 }
 
 const storagePrefix = "ags-storage-";
 
 function loadLocalStorage() {
-	new Array(inputMap, checkboxMap, selectorMap).forEach((collection, index) => {
+	new Array(inputs, checkboxes, selectors).forEach((collection, index) => {
 		collection.forEach((element, key, map) => {
 			const storageKey = `${storagePrefix}${index}${key}`;
 			browser.storage.local.get(storageKey).then((storedValue) => {
@@ -328,7 +328,7 @@ function loadLocalStorage() {
 
 function saveLocalStorage() {
 	storedItems = {}
-	new Array(inputMap, checkboxMap, selectorMap).forEach((collection, index) => {
+	new Array(inputs, checkboxes, selectors).forEach((collection, index) => {
 		collection.forEach((element, key, map) => {
 			console.log(element, element.getValue());
 			const storageKey = `${storagePrefix}${index}${key}`;
@@ -364,7 +364,7 @@ function numericalInputSanitizer(value) {
 	return value.replaceAll(/[^0-9.,]/gi, '');
 }
 
-let inputMap = new Map([
+let inputs = new Map([
 	['all-phrases', {}],
 	['any-phrases', {}],
 	['url', {}],
@@ -378,7 +378,7 @@ let inputMap = new Map([
 	['before-date', {}],
 ]);
 
-let selectorMap = new Map([
+let selectors = new Map([
 	['language', {}],
 	['region', {}],
 	['period', {}],
@@ -386,18 +386,18 @@ let selectorMap = new Map([
 	['type', {}],
 ]);
 
-let checkboxMap = new Map([
+let checkboxes = new Map([
 	['date', {}],
 	['type', {}]
 ]);
 
 function appendChildAsHTML(element, html) {
-	element.innerHTML += html;
+	element.innerHTML += DOMPurify.sanitize(html);
 }
 
 // append after all the siblings 
 function appendAlongsideAsHTML(element, html) {
-	element.parentElement.innerHTML += html;
+	element.parentElement.innerHTML += DOMPurify.sanitize(html);
 }
 
 function main() {
@@ -420,7 +420,7 @@ function main() {
 	 * initializing collections with user input elements for ease of future reference
 	 */
 
-	inputMap.forEach((value, key, map) => {
+	inputs.forEach((value, key, map) => {
 		let data = map.get(key);
 		data.htmlElement = document.getElementById(`${key}-input`);
 
@@ -428,7 +428,7 @@ function main() {
 		data.setValue = (value) => data.htmlElement.value = value;
 	});
 
-	selectorMap.forEach((value, key, map) => {
+	selectors.forEach((value, key, map) => {
 		let data = map.get(key);
 		data.htmlElement = document.getElementById(`${key}-select`);
 
@@ -436,7 +436,7 @@ function main() {
 		data.setValue = data.htmlElement.fstdropdown.setValue;
 	});
 
-	checkboxMap.forEach((value, key, map) => {
+	checkboxes.forEach((value, key, map) => {
 		let data = map.get(key);
 		data.htmlElement = document.getElementById(`${key}-checkbox`);
 

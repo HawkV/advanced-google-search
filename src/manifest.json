@@ -11,7 +11,7 @@
     {
       "matches": ["https://*.google.com/*"],
       "css": ["styles/search.css", "styles/fstdropdown.css"],
-      "js": ["content_scripts/fstdropdown.js", "content_scripts/dropdowndata.js", "content_scripts/search.js"]
+      "js": ["content_scripts/fstdropdown.js", "content_scripts/dropdowndata.js", "content_scripts/purify.min.js", "content_scripts/search.js"]
     }
   ],
   
