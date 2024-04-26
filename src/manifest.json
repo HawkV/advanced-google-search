@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Advanced Google Search",
-  "version": "1.0",
+  "version": "1.1.0",
   "description": "Adds a button to Google Search that allows you to use advanced search options from the search page",
   "icons": {
     "48": "icons/logo.png"
