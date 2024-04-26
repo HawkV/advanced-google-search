@@ -14,6 +14,14 @@
       "js": ["content_scripts/fstdropdown.js", "content_scripts/dropdowndata.js", "content_scripts/search.js"]
     }
   ],
+  
+  "host_permissions": [
+    "https://*.google.com/*"
+  ],
+
+  "permissions": [
+    "storage"
+  ],
 
   "browser_specific_settings": {
     "gecko": {

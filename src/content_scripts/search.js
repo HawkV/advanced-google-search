@@ -121,6 +121,10 @@ let searchDropdown = `
 </div>
 `
 
+function onError(error) {
+	console.log(`advanced-google-search extension error: ${error}`);
+}
+
 function requireSingleElementWithClass(name) {
 	elementList = document.getElementsByClassName(name);
 	if (elementList.length != 1) {
@@ -132,7 +136,7 @@ function requireSingleElementWithClass(name) {
 			elementCount = 'more than one element';
 		}
 
-		console.log(`Extension error, ${elementCount} with class ${name}`);
+		onError(`${elementCount} with class ${name}`);
 		process.exit(1);
 	}
 
@@ -243,34 +247,34 @@ function onSearchButtonClick() {
 
 	let extendedQueryParameters = [];
 
-	let allPhrases = getSanitizedValue(inputs, 'all-phrases');
+	let allPhrases = getSanitizedValue(inputMap, 'all-phrases');
 	queryParameters.set('as_q', prependKeywordToEachPhrase(allPhrases, '', '+', '+', '+')); // trivial case of no actual keyword
 
-	let anyPhrases = getSanitizedValue(inputs, 'any-phrases');
+	let anyPhrases = getSanitizedValue(inputMap, 'any-phrases');
 	queryParameters.set('as_oq', prependKeywordToEachPhrase(anyPhrases, '', '+', '+', '+'));
 
-	let urlContains = getSanitizedValue(inputs, 'url');
+	let urlContains = getSanitizedValue(inputMap, 'url');
 	extendedQueryParameters.push(prependKeywordToEachPhrase(urlContains, 'inurl:', '+', '+', '+'));
 
-	let titleContains = getSanitizedValue(inputs, 'title');
+	let titleContains = getSanitizedValue(inputMap, 'title');
 	extendedQueryParameters.push(prependKeywordToEachPhrase(titleContains, 'intitle:', '+', '+', '+'));
 
-	let textContains = getSanitizedValue(inputs, 'text');
+	let textContains = getSanitizedValue(inputMap, 'text');
 	extendedQueryParameters.push(prependKeywordToEachPhrase(textContains, 'intext:', '+', '+', '+'));
 
-	queryParameters.set('as_nlo', getSanitizedValue(inputs, 'lower-bound'));
-	queryParameters.set('as_nhi', getSanitizedValue(inputs, 'upper-bound'));
-	queryParameters.set('as_sitesearch', getSanitizedValue(inputs, 'domain'));
+	queryParameters.set('as_nlo', getSanitizedValue(inputMap, 'lower-bound'));
+	queryParameters.set('as_nhi', getSanitizedValue(inputMap, 'upper-bound'));
+	queryParameters.set('as_sitesearch', getSanitizedValue(inputMap, 'domain'));
 
-	queryParameters.set('lr', getSanitizedValue(selectors, 'language'));
-	queryParameters.set('cr', getSanitizedValue(selectors, 'region'));
-	queryParameters.set('as_occt', getSanitizedValue(selectors, 'terms'));
+	queryParameters.set('lr', getSanitizedValue(selectorMap, 'language'));
+	queryParameters.set('cr', getSanitizedValue(selectorMap, 'region'));
+	queryParameters.set('as_occt', getSanitizedValue(selectorMap, 'terms'));
 
 	if (!isDatePickerEnabled()) {
-		queryParameters.set('as_qdr', getSanitizedValue(selectors, 'period'));
+		queryParameters.set('as_qdr', getSanitizedValue(selectorMap, 'period'));
 	} else {
-		let beforeDate = getSanitizedValue(inputs, 'before-date');
-		let afterDate = getSanitizedValue(inputs, 'after-date');
+		let beforeDate = getSanitizedValue(inputMap, 'before-date');
+		let afterDate = getSanitizedValue(inputMap, 'after-date');
 		
 		if (beforeDate) {
 			extendedQueryParameters.push(`before:${beforeDate}`);
@@ -282,9 +286,9 @@ function onSearchButtonClick() {
 	}
 
 	if (!isTypeInputEnabled()) {
-		queryParameters.set('as_filetype', getSanitizedValue(selectors, 'type'));
+		queryParameters.set('as_filetype', getSanitizedValue(selectorMap, 'type'));
 	} else {
-		let filetypeList = getSanitizedValue(inputs, 'type');
+		let filetypeList = getSanitizedValue(inputMap, 'type');
 		extendedQueryParameters.push(prependKeywordToEachPhrase(filetypeList, 'filetype:', '+OR+', '+', '+'));
 	}
 
@@ -300,58 +304,39 @@ function onSearchButtonClick() {
 }
 
 function isDatePickerEnabled() {
-	return checkboxes.get('date').getValue();
+	return checkboxMap.get('date').getValue();
 }
 
 function isTypeInputEnabled() {
-	return checkboxes.get('type').getValue();
+	return checkboxMap.get('type').getValue();
 }
 
+const storagePrefix = "ags-storage-";
+
 function loadLocalStorage() {
-	inputs.forEach((element, key, map) => {
-		let storedValue = localStorage.getItem(`input-${key}`);
-		if (storedValue) {
-			element.setValue(storedValue);
-		}
-	});
-
-	selectors.forEach((element, key, map) => {
-		let storedValue = localStorage.getItem(`selector-${key}`);
-		if (storedValue) {
-			element.setValue(storedValue);
-		}
-	});
-
-	checkboxes.forEach((element, key, map) => {
-		let storedValue = localStorage.getItem(`checkbox-${key}`);
-		if (storedValue) {
-			element.setValue(true);
-		} else {
-			element.setValue(false);
-		}
-	});
+	new Array(inputMap, checkboxMap, selectorMap).forEach((collection, index) => {
+		collection.forEach((element, key, map) => {
+			const storageKey = `${storagePrefix}${index}${key}`;
+			browser.storage.local.get(storageKey).then((storedValue) => {
+				if (storedValue[storageKey] !== undefined && storedValue[storageKey].value !== undefined) {
+					element.setValue(storedValue[storageKey].value);
+				}
+			}, onError);
+		});
+	})
 }
 
 function saveLocalStorage() {
-	inputs.forEach((element, key, map) => {
-		localStorage.setItem(`input-${key}`, element.getValue());
+	storedItems = {}
+	new Array(inputMap, checkboxMap, selectorMap).forEach((collection, index) => {
+		collection.forEach((element, key, map) => {
+			console.log(element, element.getValue());
+			const storageKey = `${storagePrefix}${index}${key}`;
+			storedItems[storageKey] = {value: element.getValue()};
+		});
 	});
 
-	selectors.forEach((element, key, map) => {
-		localStorage.setItem(`selector-${key}`, element.getValue());
-	});
-
-	checkboxes.forEach((element, key, map) => {
-		let localKey = `checkbox-${key}`;
-
-		// localStorage can store only strings. "false" evaluates as true because string is not empty
-		// here, existence of value is 'true', its absence is 'false'
-		if (element.getValue()) {
-			localStorage.setItem(localKey, true);
-		} else {
-			localStorage.removeItem(localKey);
-		}
-	});
+	browser.storage.local.set(storedItems);
 }
 
 function getSanitizedValue(inputCollection, key) {
@@ -379,7 +364,7 @@ function numericalInputSanitizer(value) {
 	return value.replaceAll(/[^0-9.,]/gi, '');
 }
 
-let inputs = new Map([
+let inputMap = new Map([
 	['all-phrases', {}],
 	['any-phrases', {}],
 	['url', {}],
@@ -393,7 +378,7 @@ let inputs = new Map([
 	['before-date', {}],
 ]);
 
-let selectors = new Map([
+let selectorMap = new Map([
 	['language', {}],
 	['region', {}],
 	['period', {}],
@@ -401,7 +386,7 @@ let selectors = new Map([
 	['type', {}],
 ]);
 
-let checkboxes = new Map([
+let checkboxMap = new Map([
 	['date', {}],
 	['type', {}]
 ]);
@@ -435,7 +420,7 @@ function main() {
 	 * initializing collections with user input elements for ease of future reference
 	 */
 
-	inputs.forEach((value, key, map) => {
+	inputMap.forEach((value, key, map) => {
 		let data = map.get(key);
 		data.htmlElement = document.getElementById(`${key}-input`);
 
@@ -443,7 +428,7 @@ function main() {
 		data.setValue = (value) => data.htmlElement.value = value;
 	});
 
-	selectors.forEach((value, key, map) => {
+	selectorMap.forEach((value, key, map) => {
 		let data = map.get(key);
 		data.htmlElement = document.getElementById(`${key}-select`);
 
@@ -451,7 +436,7 @@ function main() {
 		data.setValue = data.htmlElement.fstdropdown.setValue;
 	});
 
-	checkboxes.forEach((value, key, map) => {
+	checkboxMap.forEach((value, key, map) => {
 		let data = map.get(key);
 		data.htmlElement = document.getElementById(`${key}-checkbox`);
 
