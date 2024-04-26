@@ -3,7 +3,7 @@
       "@advanced-google-search": {
         "updates": [
           {
-            "version": "1.0.0",  
+            "version": "1.1.0",  
             "browser_specific_settings": {
                 "gecko": {
                     "id": "@advanced-google-search",
