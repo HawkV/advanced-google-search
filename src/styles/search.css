@@ -99,6 +99,7 @@
 .last-column {
   grid-column-start: -1;
   grid-column-end: -2;
+  flex-direction: row-reverse;
 }
 
 /* if we are on the main page of google, change dropdown layout */
@@ -146,10 +147,11 @@ html[itemtype="http://schema.org/WebPage"] {
   float: right;
 }
 
-.search-dropdown-button-container{
-  padding: 10px;
+.search-dropdown-bottom-container{
+  padding: 10px 10px 0px 0px;
   position: relative;  
   min-height: 25px;
+  display: flex;
 }
 
 .search-dropdown-button {
@@ -158,16 +160,10 @@ html[itemtype="http://schema.org/WebPage"] {
   border: 1px solid rgb(218,220,224);
   color: rgb(26,115,232);
   cursor: pointer;
-  display: inline-flex;
-  flex-shrink: 0;
   font-size: 14px;
-  justify-content: center;
-  letter-spacing: .25px;
-  outline: 0;
   padding: 8px 24px;
-  position: absolute;
-  bottom: 0;
-  right: 15px;
+  float: right;
+  margin-right: 10px;
 }
 
 .search-dropdown-button:hover{
@@ -178,11 +174,16 @@ html[itemtype="http://schema.org/WebPage"] {
   margin: 0;
 }
 
+.center-label {
+  align-self: center;
+}
+
 /* custom styles for fst-dropdown */
 
 .custom-dropdown {
   .fstdropdown > .fstselected {
     color: rgb(0, 0, 0);
+    box-shadow: none;
   }
 
   .fstlist > div {

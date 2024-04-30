@@ -1,7 +1,8 @@
 /**
  * cross-browser namespace support
+ * browser is Firefox api accessor, window.chrome is for chromium-based Chrome/Opera
  */
-const browser = window.browser || window.chrome;
+globalBrowser = browser || window.chrome;
 
 let googleClasses = {
 	'searchBarContainer': 'A8SBwf',
@@ -118,8 +119,13 @@ let searchDropdown = `
 				</div>		
 				<input autocomplete="false" autocorrect="false" id="type-input" text="text" class="search-dropdown-input-field" id="type-input" placeholder="Comma-separated list of file types">
 			</div>		
-			<div class="search-dropdown-button-container last-column">
+			<div class="search-dropdown-bottom-container">
+				<input type=checkbox id="save-parameters-checkbox">
+				<label class="center-label">Save query parameters</label>
+			</div>
+			<div class="search-dropdown-bottom-container last-column">
 				<div class="search-dropdown-button" id="search-dropdown-button" tabindex="0" role="button">Advanced Search</div>
+				<div class="search-dropdown-button" id="clear-parameters-button" tabindex="0" role="button">Clear Parameters</div>
 			</div>
 		</div>
 	</div>
@@ -316,32 +322,70 @@ function isTypeInputEnabled() {
 	return checkboxes.get('type').getValue();
 }
 
+function isSaveParametersEnabled() {
+	return checkboxes.get('save-parameters').getValue();
+}
+
 const storagePrefix = "ags-storage-";
 
 function loadLocalStorage() {
 	new Array(inputs, checkboxes, selectors).forEach((collection, index) => {
 		collection.forEach((element, key, map) => {
 			const storageKey = `${storagePrefix}${index}${key}`;
-			browser.storage.local.get(storageKey).then((storedValue) => {
+			globalBrowser.storage.local.get(storageKey).then((storedValue) => {
 				if (storedValue[storageKey] !== undefined && storedValue[storageKey].value !== undefined) {
 					element.setValue(storedValue[storageKey].value);
 				}
 			}, onError);
 		});
-	})
+	});
 }
 
 function saveLocalStorage() {
+	if (!isSaveParametersEnabled()) {
+		return;
+	}
+
 	storedItems = {}
 	new Array(inputs, checkboxes, selectors).forEach((collection, index) => {
 		collection.forEach((element, key, map) => {
-			console.log(element, element.getValue());
 			const storageKey = `${storagePrefix}${index}${key}`;
 			storedItems[storageKey] = {value: element.getValue()};
 		});
 	});
 
-	browser.storage.local.set(storedItems);
+	globalBrowser.storage.local.set(storedItems);
+}
+
+/**
+ * clearing only the data this extension wrote/could have written to the local storage
+ */
+function clearLocalStorage() {
+	new Array(inputs, checkboxes, selectors).forEach((collection, index) => {
+		collection.forEach((element, key, map) => {
+			const storageKey = `${storagePrefix}${index}${key}`;
+			globalBrowser.storage.local.remove(storageKey);
+		});
+	});
+}
+
+function resetInputValues() {
+	new Array(inputs, checkboxes, selectors).forEach((collection, index) => {
+		collection.forEach((element, key, map) => {
+			element.resetValue();
+		})
+	});
+}
+
+function onClearParametersClick() {
+	resetInputValues();
+	clearLocalStorage();
+}
+
+function onSaveParametersCheckboxClick() {
+	if (!isSaveParametersEnabled()) {
+		clearLocalStorage();
+	}
 }
 
 function getSanitizedValue(inputCollection, key) {
@@ -393,7 +437,8 @@ let selectors = new Map([
 
 let checkboxes = new Map([
 	['date', {}],
-	['type', {}]
+	['type', {}],
+	['save-parameters', {}],
 ]);
 
 function appendChildAsHTML(element, html) {
@@ -416,7 +461,9 @@ function main() {
 
 	optionsMap.forEach((value, key, map) => {
 		let select = document.getElementById(`${key}-select`);
-		value.forEach((element) => appendChildAsHTML(select, `<option value="${element.value}">${element.content}</option>`));
+		value.forEach((element, index) => {
+			appendChildAsHTML(select, `<option value="${element.value}">${element.content}</option>`)
+		});
 	});
 
 	setFstDropdown();
@@ -431,6 +478,8 @@ function main() {
 
 		data.getValue = () => data.htmlElement.value;
 		data.setValue = (value) => data.htmlElement.value = value;
+
+		data.resetValue = () => data.htmlElement.value = '';
 	});
 
 	selectors.forEach((value, key, map) => {
@@ -439,6 +488,11 @@ function main() {
 
 		data.getValue = () => data.htmlElement.value;
 		data.setValue = data.htmlElement.fstdropdown.setValue;
+
+		data.defaultValue = optionsMap.get(key)[0].value;
+		data.resetValue = () => {
+			data.htmlElement.fstdropdown.setValue(data.defaultValue)
+		};
 	});
 
 	checkboxes.forEach((value, key, map) => {
@@ -446,12 +500,16 @@ function main() {
 		data.htmlElement = document.getElementById(`${key}-checkbox`);
 
 		data.getValue = () => data.htmlElement.checked;
-		data.setValue = (value) => data.htmlElement.checked = value;
+		data.setValue	 = (value) => data.htmlElement.checked = value;
+
+		data.resetValue = () => data.htmlElement.checked = false;
 	});
 
 	document.getElementById('search-button').onclick = onSearchClick;
 	document.getElementById('search-dropdown-close').onclick = onCloseClick;
 	document.getElementById('search-dropdown-button').onclick = onSearchButtonClick;
+	document.getElementById('clear-parameters-button').onclick = onClearParametersClick;
+	document.getElementById('save-parameters-checkbox').onclick = onSaveParametersCheckboxClick;
 }
 
 main();
